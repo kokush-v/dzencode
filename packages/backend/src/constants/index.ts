@@ -14,3 +14,7 @@ export const MESSAGES = {
     CREATED: 'USER_CREATED'
   }
 };
+
+export const INDEXES = {
+  USER: 'user'
+};

@@ -1,15 +1,16 @@
-import { User } from '../entities/User.entity';
-import { IUser } from './user.type';
+import { UserLoginSchema, UserRegistrationSchema, UserSchema } from '../schemas/user.schema';
 
 export interface CreateUserRequest extends Express.Request {
-  body: IUser;
+  body: UserRegistrationSchema;
 }
 
 export interface GetUserRequest extends Express.Request {
-  body: User;
+  body: UserSchema;
 }
 
-export interface LoginUserRequest extends CreateUserRequest {}
+export interface LoginUserRequest extends Express.Request {
+  body: UserLoginSchema;
+}
 
 export interface GetExistRequest extends GetUserRequest {
   route: {

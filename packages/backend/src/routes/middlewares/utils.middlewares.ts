@@ -29,7 +29,6 @@ export const isExist =
 
         try {
           await entity.findOne(email);
-
           if (req.route.path !== '/register') {
             return next();
           }
@@ -37,18 +36,17 @@ export const isExist =
           if (req.route.path === '/register') {
             return next();
           }
-
           throw new Error(ERRORS.USER.NOT_EXIST);
         }
 
-        throw new Error(ERRORS.USER.NOT_EXIST);
+        throw new Error(ERRORS.USER.EXIST);
       }
 
       next();
     } catch (error: unknown) {
       if (error instanceof Error) {
         res.status(400).json({
-          error: error.name === 'EntityNotFoundError' ? ERRORS.NOT_FOUND : error.message
+          error: error.message
         });
       }
     }

@@ -5,6 +5,9 @@ declare global {
       JWT_EXPIRATION: string;
       CLIENT_URL: string;
       BACK_URL: string;
+      ELASTIC_ENDPOINT: string;
+      ELASTIC_API_KEY_ID: string;
+      ELASTIC_API_KEY: string;
     }
   }
 }

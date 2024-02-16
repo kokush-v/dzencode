@@ -5,14 +5,10 @@ import cors from 'cors';
 import passport from 'passport';
 
 import AppRouter from './routes';
-import connectDB from './config/database';
 import { corsConfig } from './config/cors.config';
 
 const app = express();
 const router = new AppRouter(app);
-// Connect to Postgres
-connectDB();
-
 // Express configuration
 
 app.use(cors(corsConfig));

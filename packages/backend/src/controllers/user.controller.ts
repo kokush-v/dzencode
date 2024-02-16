@@ -6,20 +6,25 @@ import UserService from '../services/user.service';
 import { CreateUserRequest, GetUserRequest, LoginUserRequest } from '../types/requests.types';
 import { CreateUserResponse, GetUserResponse, LoginUserResponse } from '../types/responses.types';
 import { comparePasswords, hashPassword } from '../routes/middlewares/auth.middlewares';
-import { User } from '../entities/User.entity';
-import { IUserSession } from '../types/user.type';
 import { ERRORS, MESSAGES } from '../constants';
+import { UserRegistrationSchema, UserSessionSchema } from '../schemas/user.schema';
 
 export class UserController {
-  constructor(private userService: UserService) {}
+  #userService: UserService;
+  constructor() {
+    this.#userService = new UserService();
+  }
 
   async registerUser(req: CreateUserRequest, res: Response<CreateUserResponse>) {
     const { email, name, password } = req.body;
-    const response = await this.userService.create({
+
+    const newUser = UserRegistrationSchema.parse({
       email,
       name,
       password: await hashPassword(password)
     });
+
+    const response = await this.#userService.create(newUser);
 
     res.send({ data: response, message: MESSAGES.USER.CREATED });
   }
@@ -31,8 +36,7 @@ export class UserController {
   ) {
     passport.authenticate('login', async (err: Error) => {
       const userReq = req.body;
-      const user = await User.findOneBy({ email: userReq.email });
-
+      const user = await this.#userService.findOne(userReq.email);
       if (err || !user) {
         return res.status(400).json({ error: ERRORS.USER.NOT_EXIST });
       }
@@ -44,7 +48,7 @@ export class UserController {
       req.login(user, { session: false }, async (error) => {
         if (error) throw error;
 
-        const body: IUserSession = { id: user.id, email: user.email, name: user.name };
+        const body: UserSessionSchema = { id: user.id, email: user.email, name: user.name };
         const token = jwt.sign({ user: body }, process.env.JWT_SECRET);
 
         return res.json({ data: user, token, message: MESSAGES.USER.LOGINED });
@@ -53,11 +57,11 @@ export class UserController {
   }
 
   async getUser(req: GetUserRequest, res: Response<GetUserResponse>) {
-    const user = req.user as IUserSession;
+    const user = req.user as UserSessionSchema;
 
     res.send({ data: user });
   }
 }
 
-const userController = new UserController(new UserService());
+const userController = new UserController();
 export default userController;
