@@ -8,6 +8,7 @@ declare global {
       ELASTIC_ENDPOINT: string;
       ELASTIC_API_KEY_ID: string;
       ELASTIC_API_KEY: string;
+      BULL_PORT: number;
     }
   }
 }

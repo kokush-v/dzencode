@@ -1,10 +1,12 @@
 import Joi from 'joi';
+
 import { Request, Response, NextFunction } from 'express';
 import UserService from '../../services/user.service';
 import { GetExistRequest } from '../../types/requests.types';
 import { ERRORS } from '../../constants';
+import PostService from '../../services/post.service';
 
-type FindServices = UserService;
+type FindServices = UserService | PostService;
 
 export const validateRequestBody =
   (schema: Joi.ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
@@ -53,17 +55,12 @@ export const isExist =
   };
 
 export const tryCatch =
-  (
-    handler: (
-      req: Request<any, any, any, any>,
-      res: Response<any>,
-      next: NextFunction
-    ) => Promise<void>
-  ) =>
+  (handler: (req: Request, res: Response, next: NextFunction) => Promise<void>) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       await handler(req, res, next);
     } catch (error) {
+      console.log(error);
       if (error instanceof Error) res.status(400).json({ error: error.message });
     }
   };

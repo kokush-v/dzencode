@@ -16,5 +16,6 @@ export const MESSAGES = {
 };
 
 export const INDEXES = {
-  USER: 'user'
+  USER: 'user',
+  POST: 'post'
 };

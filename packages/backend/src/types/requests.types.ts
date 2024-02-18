@@ -1,15 +1,15 @@
-import { UserLoginSchema, UserRegistrationSchema, UserSchema } from '../schemas/user.schema';
+import { IUserLoginSchema, IUserRegistrationSchema, IUserSchema } from '../schemas/user.schema';
 
 export interface CreateUserRequest extends Express.Request {
-  body: UserRegistrationSchema;
+  body: IUserRegistrationSchema;
 }
 
 export interface GetUserRequest extends Express.Request {
-  body: UserSchema;
+  body: IUserSchema;
 }
 
 export interface LoginUserRequest extends Express.Request {
-  body: UserLoginSchema;
+  body: IUserLoginSchema;
 }
 
 export interface GetExistRequest extends GetUserRequest {

@@ -1,5 +1,6 @@
 {
   "typeRoots": ["@types/node", "./src/types"],
+
   "compilerOptions": {
     "strict": true,
     "module": "CommonJS",

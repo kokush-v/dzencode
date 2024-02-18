@@ -1,4 +1,4 @@
-import { UserSessionSchema } from '../schemas/user.schema';
+import { IUserSessionSchema } from '../schemas/user.schema';
 
 export interface Status {
   message?: string;
@@ -9,12 +9,12 @@ export interface Pages {
 }
 
 export interface GetUserResponse {
-  data?: UserSessionSchema;
+  data?: IUserSessionSchema;
 }
 
 export interface CreateUserResponse extends Status, GetUserResponse {}
 
 export interface LoginUserResponse extends Status {
-  data?: UserSessionSchema;
+  data?: IUserSessionSchema;
   token: string;
 }
