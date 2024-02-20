@@ -44,6 +44,15 @@ export const isExist =
         throw new Error(ERRORS.USER.EXIST);
       }
 
+      if (entity instanceof PostService) {
+        try {
+          const { postId } = req.params;
+          await entity.findOne(postId);
+        } catch (error) {
+          throw new Error(ERRORS.NOT_FOUND);
+        }
+      }
+
       next();
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -55,7 +64,7 @@ export const isExist =
   };
 
 export const tryCatch =
-  (handler: (req: Request, res: Response, next: NextFunction) => Promise<void>) =>
+  (handler: (req: Request<any>, res: Response, next: NextFunction) => Promise<void>) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       await handler(req, res, next);

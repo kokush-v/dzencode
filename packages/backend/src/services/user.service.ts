@@ -2,11 +2,11 @@ import { IUserRegistrationSchema, IUserSchema, UserSchema } from '../schemas/use
 import { ERRORS, INDEXES } from '../constants';
 import db from '../config/database.config';
 import QUEUE from '../queue/list';
-import { queue } from '../config/bull.config';
+import { queueService } from '../queue/bull';
 
 export default class UserService {
   async create(user: IUserRegistrationSchema): Promise<IUserSchema> {
-    const createJob = await queue.add(QUEUE.CREATE, { data: user, index: INDEXES.USER });
+    const createJob = await queueService.addJob(QUEUE.CREATE, { data: user, index: INDEXES.USER });
     const response = await createJob.finished();
 
     const newUser = UserSchema.parse({ ...user, id: response._id });

@@ -13,19 +13,19 @@ import {
 } from '../schemas/user.schema';
 import QUEUE from '../queue/list';
 import { localStrategy } from '../routes/middlewares/auth.middlewares';
-import { queue } from '../config/bull.config';
-import { getRedisClient } from '../config/redis.config';
+import { queueService } from '../queue/bull';
+import { redisClient } from '../cache/redis';
 
 export class UserController {
-  #userService: UserService;
+  private userService: UserService;
   constructor() {
-    this.#userService = new UserService();
+    this.userService = new UserService();
   }
 
   async registerUser(req: CreateUserRequest, res: Response<CreateUserResponse>) {
     const { email, name, password } = req.body;
 
-    const hashJob = await queue.add(QUEUE.PASSWORD_HASH, { password });
+    const hashJob = await queueService.addJob(QUEUE.PASSWORD_HASH, { password });
     const hashedPassword: string = await hashJob.finished();
 
     const newUser = UserRegistrationSchema.parse({
@@ -34,7 +34,7 @@ export class UserController {
       password: hashedPassword
     });
 
-    const response = await this.#userService.create(newUser);
+    const response = await this.userService.create(newUser);
 
     res.send({ data: response, message: MESSAGES.USER.CREATED });
   }
@@ -62,18 +62,17 @@ export class UserController {
   }
 
   async getUser(req: GetUserRequest, res: Response<GetUserResponse>) {
-    const redisClient = await getRedisClient();
-
     const { email } = req.user as IUserSessionSchema;
     let user: IUserSessionSchema;
-    const cache = await redisClient.get(email);
+    const cache = null;
+    await redisClient().get(email);
 
     if (cache) {
       user = UserSessionSchema.parse(JSON.parse(cache));
     } else {
-      const findUserJob = await queue.add(QUEUE.FIND_USER, { email });
+      const findUserJob = await queueService.addJob(QUEUE.FIND_USER, { email });
       user = await findUserJob.finished();
-      queue.add(QUEUE.CACHE_DATA, user);
+      queueService.addJob(QUEUE.CACHE_DATA, user);
     }
 
     res.send({ data: user });

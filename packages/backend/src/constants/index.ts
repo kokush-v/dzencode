@@ -12,6 +12,9 @@ export const MESSAGES = {
   USER: {
     LOGINED: 'USER_LOGINED',
     CREATED: 'USER_CREATED'
+  },
+  POST: {
+    CREATED: 'POST_CREATED'
   }
 };
 

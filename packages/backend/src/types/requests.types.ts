@@ -1,3 +1,4 @@
+import { IPostCreateSchema } from '../schemas/post.schema';
 import { IUserLoginSchema, IUserRegistrationSchema, IUserSchema } from '../schemas/user.schema';
 
 export interface CreateUserRequest extends Express.Request {
@@ -12,7 +13,17 @@ export interface LoginUserRequest extends Express.Request {
   body: IUserLoginSchema;
 }
 
-export interface GetExistRequest extends GetUserRequest {
+export interface CreatePostRequest extends Express.Request {
+  body: IPostCreateSchema;
+}
+
+export interface GetPostRequest extends Express.Request {
+  params: {
+    postId: string;
+  };
+}
+
+export interface GetExistRequest extends GetUserRequest, GetPostRequest {
   route: {
     path: string;
   };

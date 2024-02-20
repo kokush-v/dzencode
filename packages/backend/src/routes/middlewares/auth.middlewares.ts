@@ -1,11 +1,10 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from 'passport-jwt';
-
+import { queueService } from '../../queue/bull';
 import { IUserSchema, UserSchema } from '../../schemas/user.schema';
-import QUEUE from '../../queue/list';
-import { queue } from '../../config/bull.config';
-import { getRedisClient } from '../../config/redis.config';
+import QUEUES from '../../queue/list';
+import { redisClient } from '../../cache/redis';
 
 const opts: StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -31,25 +30,24 @@ passport.use(
     },
     async (email, password, done) => {
       try {
-        const redisClient = await getRedisClient();
+        const cache = await redisClient().get(email);
 
         let user: IUserSchema;
-        const cache = await redisClient.get(email);
 
-        const findUserJob = await queue.add(QUEUE.FIND_USER, { email });
+        const findUserJob = await queueService.addJob(QUEUES.FIND_USER, { email });
         user = await findUserJob.finished();
 
         if (cache) {
           user = UserSchema.parse(JSON.parse(cache));
         } else {
-          queue.add(QUEUE.CACHE_DATA, user);
+          queueService.addJob(QUEUES.CACHE_DATA, user);
         }
 
         if (!user) {
           return done(null, false, { message: 'User not found' });
         }
 
-        const comparePasswordsJob = await queue.add(QUEUE.COMPARE_PASSWORDS, {
+        const comparePasswordsJob = await queueService.addJob(QUEUES.COMPARE_PASSWORDS, {
           password,
           userPassword: user.password
         });

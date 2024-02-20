@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
-
 import { TypeOf, string, z } from 'zod';
 
 export const UserSchema = z.object({
