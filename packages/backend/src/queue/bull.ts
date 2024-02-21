@@ -1,6 +1,7 @@
 import Bull, { Job, Queue } from 'bull';
-import QUEUES from './list';
 import bcrypt from 'bcrypt';
+
+import QUEUES from './list';
 import { IUserRegistrationSchema, IUserSchema } from '../schemas/user.schema';
 import { IPostCreateSchema, IPostSchema } from '../schemas/post.schema';
 import db from '../config/database.config';
@@ -18,7 +19,7 @@ export class QueueService {
 
   private static QUEUE_OPTIONS = {
     defaultJobOptions: {
-      removeOnComplete: false, // this indicates if the job should be removed from the queue once it's complete
+      removeOnComplete: true, // this indicates if the job should be removed from the queue once it's complete
       removeOnFail: true // this indicates if the job should be removed from the queue if it fails
     },
     connection: {
@@ -46,15 +47,16 @@ export class QueueService {
     this.defaultQueue.process(
       QUEUES.CREATE,
       async (job: Job<{ data: InsertSchemas; index: string }>, done) => {
+        console.log(job.data.index);
         try {
           const { data, index } = job.data;
           const response = await db.index({
             index,
             document: data
           });
-
           done(null, response);
         } catch (err) {
+          console.log(err);
           if (err instanceof Error) done(err, null);
         }
       }

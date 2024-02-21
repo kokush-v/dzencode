@@ -1,14 +1,13 @@
 import { INDEXES } from '../constants';
 import db from '../config/database.config';
 import { IPostCreateSchema, IPostSchema, PostSchema } from '../schemas/post.schema';
-import QUEUE from '../queue/list';
-import { queue } from '../config/bull.config';
+import { queueService } from '../queue/bull';
+import QUEUES from '../queue/list';
 
 export default class PostService {
   async create(post: IPostCreateSchema): Promise<IPostSchema> {
-    const createJob = await queue.add(QUEUE.CREATE, { post, index: INDEXES.USER });
+    const createJob = await queueService.addJob(QUEUES.CREATE, { data: post, index: INDEXES.POST });
     const response = await createJob.finished();
-
     const newPost = PostSchema.parse({ ...post, id: response._id });
 
     return newPost;

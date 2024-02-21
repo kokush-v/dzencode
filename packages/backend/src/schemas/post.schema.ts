@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
-
-import { TypeOf, string, z, array } from 'zod';
+import { TypeOf, string, z } from 'zod';
 
 export const PostSchema = z.object({
   id: string(),
@@ -8,7 +6,7 @@ export const PostSchema = z.object({
   userName: string(),
   text: string(),
   homePageUrl: string().optional().nullable(),
-  files: array(string()).optional().nullable()
+  file: string().optional().nullable()
 });
 
 export const PostCreateShema = PostSchema.omit({
