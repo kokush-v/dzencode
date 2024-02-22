@@ -10,14 +10,14 @@ import { postCreateValidationSchema } from '../middlewares/validation.schemas';
 const postRouter: Router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-postRouter.get('/get', isExist(PostService), tryCatch(postController.getPost.bind(postController)));
-
+postRouter.get('/', tryCatch(postController.getMany.bind(postController)));
+postRouter.get('/get', isExist(PostService), tryCatch(postController.getOne.bind(postController)));
 postRouter.post(
   '/create',
   passport.authenticate('jwt', { session: false }),
   upload.single('file'),
   validateRequestBody(postCreateValidationSchema),
-  tryCatch(postController.createPost.bind(postController))
+  tryCatch(postController.create.bind(postController))
 );
 
 export default postRouter;

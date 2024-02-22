@@ -23,6 +23,12 @@ export interface GetPostRequest extends Express.Request {
   };
 }
 
+export interface GetPostsRequestQuery extends Express.Request {
+  query: {
+    page: number;
+  };
+}
+
 export interface GetExistRequest extends GetUserRequest, GetPostRequest {
   route: {
     path: string;

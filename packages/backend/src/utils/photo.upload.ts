@@ -1,18 +1,19 @@
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
-import sharp from 'sharp';
+import jimp from 'jimp';
 
 export const photoUpload = async (file: Express.Multer.File | undefined): Promise<string> => {
-  if (!file || file.mimetype.split('/')[0] !== 'image') throw Error('Wrong format');
+  if (!file) throw Error('Error');
 
-  const storageRef = ref(getStorage(), `posts/${file.originalname}`);
+  const storageRef = ref(getStorage(), `posts/photos/${new Date().getTime()}?${file.originalname}`);
 
   const metadata = {
     contentType: file.mimetype
   };
 
-  const resizedPhoto = await sharp(file.buffer).resize(320, 240).toBuffer();
+  const image = await jimp.read(file.buffer);
+  const resizedImage = await image.resize(320, 240).getBufferAsync(file.mimetype);
 
-  const snapshot = await uploadBytesResumable(storageRef, resizedPhoto, metadata);
+  const snapshot = await uploadBytesResumable(storageRef, resizedImage, metadata);
 
   const downloadURL = await getDownloadURL(snapshot.ref);
 

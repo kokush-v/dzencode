@@ -6,7 +6,8 @@ export const PostSchema = z.object({
   userName: string(),
   text: string(),
   homePageUrl: string().optional().nullable(),
-  file: string().optional().nullable()
+  file: string().optional().nullable(),
+  createdAt: z.coerce.date().default(new Date())
 });
 
 export const PostCreateShema = PostSchema.omit({
