@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
 import sanitizeHtml from 'sanitize-html';
-import { Card, CardBody, CardProps, Divider, HStack, Text, VStack } from '@chakra-ui/react';
+import {
+  Card,
+  CardBody,
+  CardProps,
+  Divider,
+  HStack,
+  Icon,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  VStack,
+  useDisclosure
+} from '@chakra-ui/react';
 
 import { IPost } from '../../../types/todo/post.types';
 import { PostTextStyled } from './post.styled';
 import LightBoxImage from '../../ui/lightbox';
-import { GoReply } from 'react-icons/go';
+import { GoFile, GoReply } from 'react-icons/go';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { generateRandomColor } from '../../../utils';
+import { generateRandomColor, getFileUrlType } from '../../../utils';
+import { Editor } from 'primereact/editor';
+import axios from 'axios';
 
 interface PostProps extends CardProps {
   post: IPost;
@@ -24,6 +43,8 @@ export const Post = ({ post, baseMg, modalOnOpen, ...props }: PostProps) => {
   });
   const color = generateRandomColor();
   const [showNested, setShowNested] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [fileTxtValue, setFileTxtValue] = useState('');
 
   return (
     <VStack width={'100%'}>
@@ -59,11 +80,53 @@ export const Post = ({ post, baseMg, modalOnOpen, ...props }: PostProps) => {
               dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
               padding={'0 .4em'}
             />
-            {post.file && (
-              <div style={{ width: 'fit-content' }}>
-                <LightBoxImage fileUrl={post.file} />
-              </div>
-            )}
+            {post.file &&
+              (getFileUrlType(post.file) === 'txt' ? (
+                <>
+                  <HStack
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpen();
+                      if (getFileUrlType(post.file) === 'txt' && post.file) {
+                        axios
+                          .get(post.file)
+                          .then(({ data }) => setFileTxtValue(data))
+                          .catch((err) => console.log(err));
+                      }
+                    }}
+                    justifyContent={'center'}
+                  >
+                    <Icon as={GoFile} />
+                    <Text>Open file</Text>
+                  </HStack>
+                  <Modal isOpen={isOpen} onClose={onClose} size={'2xl'}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader></ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        <Editor
+                          readOnly
+                          id="text"
+                          name="text"
+                          value={fileTxtValue}
+                          headerTemplate={
+                            <span className="ql-formats">
+                              <button className="ql-code" aria-label="Code"></button>
+                            </span>
+                          }
+                          style={{ minHeight: '240px' }}
+                        />
+                      </ModalBody>
+                      <ModalFooter />
+                    </ModalContent>
+                  </Modal>
+                </>
+              ) : (
+                <div style={{ width: 'fit-content' }}>
+                  <LightBoxImage fileUrl={post.file} />
+                </div>
+              ))}
           </PostTextStyled>
           {!showNested && post.replies && post.replies.length !== 0 && (
             <>

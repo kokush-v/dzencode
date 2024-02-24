@@ -35,3 +35,7 @@ export function generateRandomColor(): string {
   }
   return color;
 }
+
+export function getFileUrlType(url?: string): string | undefined {
+  if (url) return url?.split('?alt')[0].split('.').reverse()[0];
+}
