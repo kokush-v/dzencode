@@ -20,4 +20,12 @@ postRouter.post(
   tryCatch(postController.create.bind(postController))
 );
 
+postRouter.post(
+  '/reply/:postId',
+  passport.authenticate('jwt', { session: false }),
+  upload.single('file'),
+  validateRequestBody(postCreateValidationSchema),
+  tryCatch(postController.reply.bind(postController))
+);
+
 export default postRouter;

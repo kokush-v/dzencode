@@ -3,6 +3,7 @@ import db from '../config/database.config';
 import { IPostCreateSchema, IPostSchema, PostSchema } from '../schemas/post.schema';
 import { queueService } from '../queue/bull';
 import QUEUES from '../queue/list';
+import { getNestedReplies } from '../utils';
 
 export default class PostService {
   async create(post: IPostCreateSchema): Promise<IPostSchema> {
@@ -35,16 +36,29 @@ export default class PostService {
       } = await db.search<IPostSchema>({
         index: INDEXES.POST,
         size,
-        from: (page - 1) * size
+        from: (page - 1) * size,
+        query: {
+          bool: {
+            must_not: {
+              exists: {
+                field: 'parent'
+              }
+            }
+          }
+        }
       });
 
       return {
-        data: hits.map((hit) => {
-          return PostSchema.parse({
-            id: hit._id,
-            ...hit._source
-          });
-        }),
+        data: await Promise.all(
+          hits.map(async (hit) => {
+            const replies = await getNestedReplies(hit._id);
+            return PostSchema.parse({
+              id: hit._id,
+              replies,
+              ...hit._source
+            });
+          })
+        ),
         total: total?.valueOf() as { value: number; relation: string }
       };
     } catch (error) {
@@ -54,6 +68,35 @@ export default class PostService {
             data: [],
             total: { value: 0, relation: '' }
           };
+        }
+      }
+      throw error;
+    }
+  }
+
+  async findReplies(postId: string): Promise<IPostSchema[]> {
+    try {
+      const {
+        hits: { hits }
+      } = await db.search<IPostSchema>({
+        index: INDEXES.POST,
+        query: {
+          match_phrase_prefix: {
+            parent: postId
+          }
+        }
+      });
+
+      return hits.map((hit) => {
+        return PostSchema.parse({
+          id: hit._id,
+          ...hit._source
+        });
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.localeCompare('index_not_found_exception') === 1) {
+          return [];
         }
       }
       throw error;

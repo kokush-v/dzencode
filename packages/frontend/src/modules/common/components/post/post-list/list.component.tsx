@@ -5,13 +5,16 @@ import { VStack } from '@chakra-ui/react';
 
 interface PostListProps {
   posts: IPost[];
+  modalOnOpen: (replyParent: IPost) => void;
 }
 
-export const PostList = ({ posts }: PostListProps) => {
+export const PostList = ({ posts, modalOnOpen }: PostListProps) => {
+  const baseMg = 20;
+
   return (
     <VStack margin={'.5em 0'} width={'100%'} gap={5}>
-      {posts.map((post) => {
-        return <Post key={post.id} post={post} />;
+      {posts.map((post, key) => {
+        return <Post modalOnOpen={modalOnOpen} baseMg={baseMg} key={key} post={post} />;
       })}
     </VStack>
   );

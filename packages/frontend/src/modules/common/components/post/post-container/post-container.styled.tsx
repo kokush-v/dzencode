@@ -1,10 +1,9 @@
 import styled from 'styled-components';
-import { isMobile } from 'react-device-detect';
 
 import { COLORS, FONTS } from '../../../../theme';
 
 export const PostContainerStyled = styled('div')`
-  width: ${isMobile ? '100%' : '70%'};
+  width: 90%;
   margin: auto;
   border: 1px solid ${COLORS.gray};
   display: flex;
@@ -22,7 +21,7 @@ export const StyledTitle = styled.div`
 `;
 
 export const StyledPostTableContainer = styled.div`
-  padding: 0.5em;
+  padding: 0.5em 8em;
 `;
 
 export const StyledPostMobileContainer = styled.div`

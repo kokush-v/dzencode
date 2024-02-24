@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useFormik } from 'formik';
 import {
   VStack,
@@ -22,14 +22,22 @@ import { PostSchema } from './validation.schema';
 import todoService from '../../post.service';
 import { QUERY_KEYS } from '../../../../consts/app-keys.const';
 import { showErrorToast, showErrorToastWithText } from '../../../form.toasts';
-import { IPostForm } from '../../../../types/todo/post.types';
-import PostModel from '../../../../types/todo/post.model';
+import { IPost, IPostForm } from '../../../../types/todo/post.types';
+import FileUpload from '../../../ui/dropzone';
+import { insertNestedPost } from '../../../../utils';
 
-export interface FormikFormProps {}
+export interface FormikFormProps {
+  initialData?: IPost;
+  formType: 'NEW' | 'REPLY';
+}
 
-export const FormikForm = () => {
+export const FormikForm = ({ initialData, formType }: FormikFormProps) => {
   const { mutate: createPostMutation } = useMutation((formPayload: IPostForm) =>
     todoService.createPost(formPayload)
+  );
+
+  const { mutate: replyPostMutation } = useMutation((formPayload: IPostForm) =>
+    todoService.replyPost(formPayload)
   );
 
   const queryClient = useQueryClient();
@@ -37,22 +45,16 @@ export const FormikForm = () => {
 
   const { isOpen: isVisibleSuccess, onOpen: successOnOpen } = useDisclosure();
 
-  const formik = useFormik<IPostForm>({
-    initialValues: {
-      text: ''
-    },
-    validationSchema: PostSchema,
-    onSubmit: (values) =>
+  const mutationList: { [key in FormikFormProps['formType']]: (values: IPostForm) => void } = {
+    NEW: (values: IPostForm) =>
       createPostMutation(values, {
         onSuccess: (post) => {
           successOnOpen();
 
           queryClient.setQueryData(
             [QUERY_KEYS.POSTS],
-            (prev: InfiniteData<PostModel[]> | undefined) => {
+            (prev: InfiniteData<IPost[]> | undefined) => {
               if (!prev) return { pageParams: [], pages: [[]] };
-
-              console.log(prev);
 
               const lastPage = prev.pages[prev.pages.length - 1];
 
@@ -78,8 +80,51 @@ export const FormikForm = () => {
             showErrorToast(toast);
           }
         }
-      })
+      }),
+    REPLY: (values: IPostForm) => {
+      replyPostMutation(values, {
+        onSuccess: (post) => {
+          successOnOpen();
+          queryClient.setQueryData(
+            [QUERY_KEYS.POSTS],
+            (prev: InfiniteData<IPost[]> | undefined) => {
+              if (!prev) return { pageParams: [], pages: [[]] };
+              console.log(post);
+
+              const updatedPrev = prev.pages.map((page) => insertNestedPost(page, post));
+
+              console.log(updatedPrev);
+
+              return prev;
+            }
+          );
+        },
+        onError: (error) => {
+          if (error instanceof AxiosError) {
+            const msg = error.response?.status === 401 ? 'UNAUTHORIZED' : error.message;
+            showErrorToastWithText(toast, msg);
+          } else {
+            showErrorToast(toast);
+          }
+        }
+      });
+    }
+  };
+
+  const formik = useFormik<IPostForm>({
+    initialValues: {
+      text: '',
+      parent: formType === 'NEW' ? undefined : initialData?.id
+    },
+    validationSchema: PostSchema,
+    onSubmit: (values) => mutationList[formType](values)
   });
+
+  const setFile = (file: File) => {
+    formik.setFieldValue('file', file);
+
+    console.log(formik.values);
+  };
 
   const renderHeader = () => {
     return (
@@ -103,7 +148,7 @@ export const FormikForm = () => {
             <form onSubmit={formik.handleSubmit}>
               <VStack spacing={4} align="center">
                 <FormControl
-                  height={'320px'}
+                  height={'auto'}
                   isInvalid={formik.touched.text && !!formik.errors.text}
                 >
                   <Editor
@@ -111,12 +156,15 @@ export const FormikForm = () => {
                     name="text"
                     value={formik.values.text}
                     onTextChange={(e) => {
-                      formik.setFieldValue('text', e.textValue);
+                      formik.setFieldValue('text', e.htmlValue?.replaceAll('</p>', '</p><br>'));
                     }}
                     headerTemplate={header}
                     style={{ height: '240px' }}
                   />
                   {formik.touched.text && <FormErrorMessage>Text is required.</FormErrorMessage>}
+                </FormControl>
+                <FormControl>
+                  <FileUpload setFile={setFile} />
                 </FormControl>
                 <Button type="submit" colorScheme="purple" width="full">
                   Create post

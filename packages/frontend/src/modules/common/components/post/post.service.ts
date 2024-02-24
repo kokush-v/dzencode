@@ -14,10 +14,32 @@ class PostService extends HttpService {
   }
 
   async createPost(body: IPostForm) {
+    const formData = new FormData();
+    Object.entries(body).forEach(([key, value]) => {
+      if (key !== 'parent') formData.append(key, value);
+    });
+
     const { data } = await this.put<IPost>({
       method: 'post',
       url: BACKEND_KEYS.POSTS.CREATE,
-      data: body
+      data: formData
+    });
+
+    return data;
+  }
+
+  async replyPost(body: IPostForm) {
+    const formData = new FormData();
+    Object.entries(body).forEach(([key, value]) => {
+      if (key !== 'parent') formData.append(key, value);
+    });
+
+    if (!body.parent) throw new Error('No reply parent');
+
+    const { data } = await this.put<IPost>({
+      method: 'post',
+      url: BACKEND_KEYS.POSTS.REPLY(body.parent),
+      data: formData
     });
 
     return data;

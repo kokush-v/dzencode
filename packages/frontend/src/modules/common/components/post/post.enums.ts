@@ -1,5 +1,6 @@
 export enum PostFilterEnum {
   ALL = 'All',
-  PRIVATE = 'Private',
-  COMPLETED = 'Completed'
+  USER = 'User',
+  EMAIL = 'Email',
+  DATE = 'Date'
 }
