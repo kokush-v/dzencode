@@ -15,6 +15,7 @@ import QUEUE from '../queue/list';
 import { localStrategy } from '../routes/middlewares/auth.middlewares';
 import { queueService } from '../queue/bull';
 import { redisClient } from '../cache/redis';
+import QUEUES from '../queue/list';
 
 export class UserController {
   private userService: UserService;
@@ -54,7 +55,10 @@ export class UserController {
       req.login(user, { session: false }, async (error) => {
         if (error) throw error;
 
-        const token = jwt.sign({ email: user.email, id: user.id }, process.env.JWT_SECRET);
+        const token = jwt.sign(
+          { email: user.email, name: user.name, id: user.id },
+          process.env.JWT_SECRET
+        );
 
         return res.json({ data: user, token, message: MESSAGES.USER.LOGINED });
       });
@@ -70,9 +74,10 @@ export class UserController {
     if (cache) {
       user = UserSessionSchema.parse(JSON.parse(cache));
     } else {
-      const findUserJob = await queueService.addJob(QUEUE.FIND_USER, { email });
+      const findUserJob = await queueService.addJob(QUEUES.FIND_USER, { email });
       user = await findUserJob.finished();
-      queueService.addJob(QUEUE.CACHE_DATA, user);
+
+      queueService.addJob(QUEUE.CACHE_DATA, { key: user.email, data: user });
     }
 
     res.send({ data: user });

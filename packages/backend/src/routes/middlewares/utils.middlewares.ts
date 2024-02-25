@@ -11,6 +11,12 @@ type FindServices = UserService | PostService;
 export const validateRequestBody =
   (schema: Joi.ObjectSchema) => (req: Request, res: Response, next: NextFunction) => {
     const validationResult = schema.validate(req.body);
+
+    const file = req.file;
+
+    if (file && file?.size > 100 && file?.mimetype.split('/')[0] === 'plain') {
+      return res.status(400).json({ error: 'File max size 100 kb' });
+    }
     if (validationResult.error) {
       return res
         .status(400)
@@ -64,12 +70,14 @@ export const isExist =
   };
 
 export const tryCatch =
-  (handler: (req: Request<any>, res: Response, next: NextFunction) => Promise<void>) =>
+  (
+    handler: (req: Request<any, any, any, any>, res: Response, next: NextFunction) => Promise<void>
+  ) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       await handler(req, res, next);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       if (error instanceof Error) res.status(400).json({ error: error.message });
     }
   };

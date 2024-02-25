@@ -26,7 +26,7 @@ export default class UserService {
     });
 
     if (hits.length === 0) {
-      throw ERRORS.NOT_FOUND;
+      throw new Error(ERRORS.NOT_FOUND);
     }
 
     const user = UserSchema.parse({ id: hits[0]._id, ...hits[0]._source });

@@ -24,4 +24,10 @@ export interface GetPostResponse extends Status {
   data: IPostSchema;
 }
 
+export interface GetPostsResponse extends Status {
+  data: IPostSchema[];
+  total: number;
+  pages: number;
+}
+
 export interface CreatePostResponse extends GetPostResponse {}

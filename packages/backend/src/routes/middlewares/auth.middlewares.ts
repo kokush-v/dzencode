@@ -14,7 +14,7 @@ const opts: StrategyOptions = {
 passport.use(
   new JwtStrategy(opts, async (token, done) => {
     try {
-      return done(null, token.user);
+      return done(null, token);
     } catch (error) {
       done(error);
     }
@@ -40,7 +40,7 @@ passport.use(
         if (cache) {
           user = UserSchema.parse(JSON.parse(cache));
         } else {
-          queueService.addJob(QUEUES.CACHE_DATA, user);
+          queueService.addJob(QUEUES.CACHE_DATA, { key: user.email, data: user });
         }
 
         if (!user) {
