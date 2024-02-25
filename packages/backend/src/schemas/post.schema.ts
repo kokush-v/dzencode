@@ -26,7 +26,6 @@ export const PostCreateShema = z.object({
   userEmail: string(),
   userName: string(),
   text: string(),
-  homePageUrl: string().optional().nullable(),
   file: string().optional().nullable(),
   createdAt: z.coerce.date().default(new Date()),
   parent: string().optional(),

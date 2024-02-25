@@ -78,13 +78,15 @@ export class PostController {
       });
     }
 
+    const pageSize = 25;
+
     res.send({
       data: postsWithTotal.data,
       total: postsWithTotal.total.value,
       pages:
-        Math.ceil(postsWithTotal.total.value / 10) === 0
+        Math.ceil(postsWithTotal.total.value / pageSize) === 0
           ? 1
-          : Math.ceil(postsWithTotal.total.value / 10)
+          : Math.ceil(postsWithTotal.total.value / pageSize)
     });
   }
   async reply(req: ReplyPostRequest, res: Response<CreatePostResponse>) {

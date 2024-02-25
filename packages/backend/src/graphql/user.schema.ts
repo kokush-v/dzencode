@@ -11,7 +11,7 @@ import UserService from '../services/user.service';
 import { queueService } from '../queue/bull';
 import QUEUES from '../queue/list';
 
-export const schema = buildSchema(`
+export const userSchema = buildSchema(`
     type User {
         id: ID! 
         email: String!
@@ -48,7 +48,7 @@ export const schema = buildSchema(`
 
 const userService = new UserService();
 
-export const root = {
+export const userRoot = {
   registerUser: async ({ input }: { input: IUserRegistrationSchema }) => {
     const hashJob = await queueService.addJob(QUEUES.PASSWORD_HASH, { password: input.password });
     const hashedPassword: string = await hashJob.finished();

@@ -90,11 +90,8 @@ export const FormikForm = ({ initialData, formType }: FormikFormProps) => {
             [QUERY_KEYS.POSTS],
             (prev: InfiniteData<IPost[]> | undefined) => {
               if (!prev) return { pageParams: [], pages: [[]] };
-              console.log(post);
 
-              const updatedPrev = prev.pages.map((page) => insertNestedPost(page, post));
-
-              console.log(updatedPrev);
+              prev.pages.map((page) => insertNestedPost(page, post));
 
               return prev;
             }
@@ -126,8 +123,6 @@ export const FormikForm = ({ initialData, formType }: FormikFormProps) => {
 
   const setFile = (file: File) => {
     formik.setFieldValue('file', file);
-
-    console.log(formik.values);
   };
 
   const renderHeader = () => {

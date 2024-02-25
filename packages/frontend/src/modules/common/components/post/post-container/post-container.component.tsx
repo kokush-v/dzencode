@@ -64,7 +64,7 @@ export const PostContainer = () => {
     refetch
   } = useInfiniteQuery<PostModel[]>(
     [QUERY_KEYS.POSTS],
-    async ({ pageParam = 1 }) => {
+    async () => {
       const response = await postService.getPosts(params);
 
       const updatedParams = {
