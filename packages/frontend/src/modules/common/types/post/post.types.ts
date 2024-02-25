@@ -1,3 +1,5 @@
+import { PostFilterEnum, PostOrderEnum } from '../../components/post/post.enums';
+
 export interface IPost {
   id: string;
   userName: string;
@@ -16,8 +18,8 @@ export interface IPostForm
 }
 
 export interface PostFilters {
-  search: string;
-  filter: '' | 'completed' | 'private';
+  sort: PostFilterEnum;
+  order: PostOrderEnum;
   page: number;
   maxPages: number;
 }

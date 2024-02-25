@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, useDisclosure } from '@chakra-ui/react';
+import { Button, Spinner, Text, useDisclosure } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { BrowserView } from 'react-device-detect';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
@@ -21,6 +21,7 @@ import PostModel from '../../../types/post/post.model';
 import { useFormattedPosts } from '../post.selectors';
 import { buildQueryString } from '../../../utils';
 import { PostList } from '../post-list';
+import { PostFilterEnum, PostOrderEnum } from '../post.enums';
 
 /* eslint-disable */
 
@@ -35,16 +36,16 @@ export const PostContainer = () => {
   const searchParams = new URLSearchParams(window.location.search);
 
   const { data: params } = useQuery<PostFilters>({
-    queryKey: [QUERY_KEYS.FILTER],
+    queryKey: [QUERY_KEYS.SORT],
     initialData: {
-      filter: (searchParams.get('filter') as '') || '',
-      search: searchParams.get('search') || '',
+      sort: (searchParams.get('sort') as PostFilterEnum) || PostFilterEnum.DATE,
+      order: (searchParams.get('order') as PostOrderEnum) || PostOrderEnum.ASC,
       page: Number(searchParams.get('page')) || 1,
       maxPages: 1
     },
     queryFn: async () => ({
-      filter: (searchParams.get('filter') as '') || '',
-      search: searchParams.get('search') || '',
+      sort: (searchParams.get('sort') as PostFilterEnum) || PostFilterEnum.DATE,
+      order: (searchParams.get('order') as PostOrderEnum) || PostOrderEnum.ASC,
       page: Number(searchParams.get('page')) || 1,
       maxPages: 1
     }),
@@ -59,18 +60,19 @@ export const PostContainer = () => {
     fetchNextPage,
     isError,
     isLoading,
+    isFetching,
     refetch
   } = useInfiniteQuery<PostModel[]>(
     [QUERY_KEYS.POSTS],
     async ({ pageParam = 1 }) => {
-      const response = await postService.getPosts(params, pageParam);
+      const response = await postService.getPosts(params);
 
       const updatedParams = {
         ...params,
         maxPages: response?.pages
       };
 
-      queryClient.setQueryData([QUERY_KEYS.FILTER], updatedParams);
+      queryClient.setQueryData([QUERY_KEYS.SORT], updatedParams);
 
       return response.data;
     },
@@ -94,7 +96,7 @@ export const PostContainer = () => {
         maxPages: data?.pageParams[data.pageParams.length - 1] || params?.maxPages
       };
 
-      queryClient.setQueryData([QUERY_KEYS.FILTER], updatedParams);
+      queryClient.setQueryData([QUERY_KEYS.SORT], updatedParams);
     });
   };
 
@@ -132,13 +134,33 @@ export const PostContainer = () => {
           initialData={replyParent}
         />
       </StyledTitle>
+      {isLoading ||
+        (isFetching && (
+          <div
+            style={{
+              position: 'absolute',
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: 'rgba(255, 255, 255, 0.54)',
+              zIndex: '100',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <Spinner size={'xl'} />
+          </div>
+        ))}
 
-      <BrowserView>
-        <StyledPostTableContainer>
-          <PostHeader />
-          <PostList modalOnOpen={modalOnOpen} posts={formatPosts} />
-        </StyledPostTableContainer>
-      </BrowserView>
+      {isError && <Text>Server error</Text>}
+      {posts && (
+        <BrowserView>
+          <StyledPostTableContainer>
+            <PostHeader />
+            <PostList modalOnOpen={modalOnOpen} posts={formatPosts} />
+          </StyledPostTableContainer>
+        </BrowserView>
+      )}
 
       <LoadMore
         isDisabled={!!params?.maxPages && params?.page ? params.page === params.maxPages : false}

@@ -16,7 +16,7 @@ export const selectPosts = () => {
 
 export const selectPostFilter = () => {
   const { data } = useQuery<PostFilters>({
-    queryKey: [QUERY_KEYS.FILTER],
+    queryKey: [QUERY_KEYS.SORT],
     select: (state) => state
   });
 

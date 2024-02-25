@@ -1,16 +1,16 @@
 import React from 'react';
 import { Tabs, TabList, Tab, TabsProps } from '@chakra-ui/react';
 
-import { PostFilterEnum } from '../post.enums';
+import { PostOrderEnum } from '../post.enums';
 
 interface PostFilterProps extends Omit<TabsProps, 'children'> {}
 
 /* eslint-disable */
 
-export const PostFilter = ({ ...props }: PostFilterProps) => (
+export const PostOrder = ({ ...props }: PostFilterProps) => (
   <Tabs {...props}>
     <TabList justifyContent={props.justifyContent} height="100%">
-      {Object.keys(PostFilterEnum)?.map((key, index) => <Tab key={index}>{key}</Tab>)}
+      {Object.keys(PostOrderEnum)?.map((key, index) => <Tab key={index}>{key}</Tab>)}
     </TabList>
   </Tabs>
 );
