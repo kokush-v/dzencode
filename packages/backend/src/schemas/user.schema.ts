@@ -11,7 +11,7 @@ export const UserLoginSchema = UserSchema.omit({ id: true, name: true });
 export const UserRegistrationSchema = UserSchema.omit({ id: true });
 export const UserSessionSchema = UserSchema.omit({ password: true });
 
-export interface UserSchema extends TypeOf<typeof UserSchema> {}
-export interface UserLoginSchema extends TypeOf<typeof UserLoginSchema> {}
-export interface UserRegistrationSchema extends TypeOf<typeof UserRegistrationSchema> {}
-export interface UserSessionSchema extends TypeOf<typeof UserSessionSchema> {}
+export interface IUserSchema extends TypeOf<typeof UserSchema> {}
+export interface IUserLoginSchema extends TypeOf<typeof UserLoginSchema> {}
+export interface IUserRegistrationSchema extends TypeOf<typeof UserRegistrationSchema> {}
+export interface IUserSessionSchema extends TypeOf<typeof UserSessionSchema> {}

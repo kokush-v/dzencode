@@ -1,25 +1,23 @@
-import { UserRegistrationSchema, UserSchema } from '../schemas/user.schema';
+import { IUserRegistrationSchema, IUserSchema, UserSchema } from '../schemas/user.schema';
 import { ERRORS, INDEXES } from '../constants';
-import db from '../config/database';
-
-// TODO: implement db.queries with elasticsearch
+import db from '../config/database.config';
+import QUEUE from '../queue/list';
+import { queueService } from '../queue/bull';
 
 export default class UserService {
-  async create(user: UserRegistrationSchema): Promise<UserSchema> {
-    const response = await db.index({
-      index: INDEXES.USER,
-      document: user
-    });
+  async create(user: IUserRegistrationSchema): Promise<IUserSchema> {
+    const createJob = await queueService.addJob(QUEUE.CREATE, { data: user, index: INDEXES.USER });
+    const response = await createJob.finished();
 
     const newUser = UserSchema.parse({ ...user, id: response._id });
 
     return newUser;
   }
 
-  async findOne(userEmail: string): Promise<UserSchema> {
+  async findOne(userEmail: string): Promise<IUserSchema> {
     const {
       hits: { hits }
-    } = await db.search<UserSchema>({
+    } = await db.search<IUserSchema>({
       query: {
         match_phrase_prefix: {
           email: userEmail

@@ -2,7 +2,7 @@
   "typeRoots": ["@types/node", "./src/types"],
   "compilerOptions": {
     "strict": true,
-    "module": "CommonJS",
+    "module": "commonjs",
     "declaration": true,
     "removeComments": true,
     "allowSyntheticDefaultImports": true,

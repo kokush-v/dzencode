@@ -1,10 +1,10 @@
-import { UserSessionSchema } from 'src/schemas/user.schema';
+import { IUserSessionSchema } from '../schemas/user.schema';
 
 // express.d.ts
 declare global {
   namespace Express {
     interface Request {
-      user: UserSessionSchema;
+      user: IUserSessionSchema;
     }
   }
 }
