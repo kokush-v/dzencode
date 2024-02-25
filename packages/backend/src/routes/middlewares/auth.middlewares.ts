@@ -2,8 +2,7 @@ import bcrypt from 'bcrypt';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from 'passport-jwt';
-
-import { User } from '../../entities/User.entity';
+import UserService from '../../services/user.service';
 
 const opts: StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -50,7 +49,7 @@ passport.use(
     },
     async (email, password, done) => {
       try {
-        const user = await User.findOneBy({ email });
+        const user = await new UserService().findOne(email);
         if (!user) {
           return done(null, false, { message: 'User not found' });
         }
