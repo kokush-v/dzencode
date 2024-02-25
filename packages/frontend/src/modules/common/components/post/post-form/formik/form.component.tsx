@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useFormik } from 'formik';
 import {
   VStack,
@@ -17,12 +17,13 @@ import {
 import { InfiniteData, useMutation, useQueryClient } from 'react-query';
 import { AxiosError } from 'axios';
 import { Editor } from 'primereact/editor';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import { PostSchema } from './validation.schema';
 import todoService from '../../post.service';
-import { QUERY_KEYS } from '../../../../consts/app-keys.const';
+import { ENV, QUERY_KEYS } from '../../../../consts/app-keys.const';
 import { showErrorToast, showErrorToastWithText } from '../../../form.toasts';
-import { IPost, IPostForm } from '../../../../types/todo/post.types';
+import { IPost, IPostForm } from '../../../../types/post/post.types';
 import FileUpload from '../../../ui/dropzone';
 import { insertNestedPost } from '../../../../utils';
 
@@ -111,10 +112,13 @@ export const FormikForm = ({ initialData, formType }: FormikFormProps) => {
     }
   };
 
+  const recaptcha = useRef<ReCAPTCHA>(null);
+
   const formik = useFormik<IPostForm>({
     initialValues: {
       text: '',
-      parent: formType === 'NEW' ? undefined : initialData?.id
+      parent: formType === 'NEW' ? undefined : initialData?.id,
+      reCaptcha: ''
     },
     validationSchema: PostSchema,
     onSubmit: (values) => mutationList[formType](values)
@@ -165,6 +169,17 @@ export const FormikForm = ({ initialData, formType }: FormikFormProps) => {
                 </FormControl>
                 <FormControl>
                   <FileUpload setFile={setFile} />
+                </FormControl>
+                <FormControl display={'flex'} justifyContent={'center'}>
+                  <ReCAPTCHA
+                    style={{ width: 'fit-content' }}
+                    onChange={() => {
+                      formik.setFieldValue('reCaptcha', recaptcha?.current?.getValue());
+                    }}
+                    ref={recaptcha}
+                    sitekey={ENV.REACT_APP_SITE_KEY}
+                  />
+                  {formik.touched.reCaptcha && <FormErrorMessage>Are you robot?.</FormErrorMessage>}
                 </FormControl>
                 <Button type="submit" colorScheme="purple" width="full">
                   Create post

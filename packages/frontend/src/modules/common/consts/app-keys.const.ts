@@ -46,3 +46,7 @@ export const ERRORS = {
   INCORRECT_PASSWORD: 'Incorrect password',
   UNAUTHORIZED: 'Please login'
 };
+
+export const ENV = {
+  REACT_APP_SITE_KEY: process.env.REACT_APP_SITE_KEY as string
+};

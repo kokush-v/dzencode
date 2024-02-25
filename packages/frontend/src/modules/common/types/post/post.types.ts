@@ -12,6 +12,7 @@ export interface IPost {
 export interface IPostForm
   extends Omit<IPost, 'id' | 'userName' | 'userEmail' | 'createdAt' | 'file' | 'replies'> {
   file?: File;
+  reCaptcha: string;
 }
 
 export interface PostFilters {

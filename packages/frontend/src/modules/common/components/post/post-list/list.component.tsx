@@ -1,5 +1,5 @@
 import React from 'react';
-import { IPost } from '../../../types/todo/post.types';
+import { IPost } from '../../../types/post/post.types';
 import { Post } from '../post-elem';
 import { VStack } from '@chakra-ui/react';
 

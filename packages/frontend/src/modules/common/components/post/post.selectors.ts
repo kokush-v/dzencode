@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 
 import { InfiniteData, useQuery } from 'react-query';
 import { QUERY_KEYS } from '../../consts/app-keys.const';
-import { PostFilters } from '../../types/todo/post.types';
-import PostModel from '../../types/todo/post.model';
+import { PostFilters } from '../../types/post/post.types';
+import PostModel from '../../types/post/post.model';
 
 export const selectPosts = () => {
   const { data } = useQuery<InfiniteData<PostModel[]>>({

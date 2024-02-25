@@ -1,7 +1,7 @@
 import HttpService from '../../../api/http.service';
 import { BACKEND_KEYS } from '../../consts/app-keys.const';
-import { createPostModel } from '../../types/todo/post.model';
-import { IPost, IPostForm, PostFilters } from '../../types/todo/post.types';
+import { createPostModel } from '../../types/post/post.model';
+import { IPost, IPostForm, PostFilters } from '../../types/post/post.types';
 
 class PostService extends HttpService {
   async getPosts(filter: Omit<PostFilters, 'maxPages'> | undefined, page: number) {

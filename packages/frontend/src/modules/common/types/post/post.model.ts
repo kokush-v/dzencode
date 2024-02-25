@@ -16,8 +16,6 @@ class PostModel implements IPost {
   replies: IPost[];
 
   constructor({ id, userName, userEmail, text, file: file, createdAt, replies }: IPost) {
-    console.log(text, replies);
-
     this.id = id;
     this.userName = userName;
     this.userEmail = userEmail;

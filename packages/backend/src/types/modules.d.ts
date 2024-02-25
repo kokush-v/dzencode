@@ -16,6 +16,7 @@ declare global {
       FIREBASE_MESSAGE_SENDER_ID: string;
       FIREBASE_APP_ID: string;
       FIREBASE_MESURMENT_ID: string;
+      SITE_SECRET: string;
     }
   }
 }

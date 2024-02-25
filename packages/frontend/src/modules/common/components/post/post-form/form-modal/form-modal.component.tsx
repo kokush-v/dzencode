@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 
 import { FormikForm } from '../formik';
-import { IPost } from '../../../../types/todo/post.types';
+import { IPost } from '../../../../types/post/post.types';
 
 interface FormModalProps extends Omit<ModalProps, 'children'> {
   initialData?: IPost;

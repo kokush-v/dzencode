@@ -5,7 +5,6 @@ export const PostSchema: ZodType<Post> = z.object({
   userEmail: string(),
   userName: string(),
   text: string(),
-  homePageUrl: string().optional().nullable(),
   file: string().optional().nullable(),
   createdAt: z.coerce.date().default(new Date()),
   parent: string().optional(),
@@ -17,7 +16,6 @@ interface Post {
   userEmail: string;
   userName: string;
   text: string;
-  homePageUrl?: string | null;
   file?: string | null;
   createdAt?: Date;
   parent?: string;
@@ -35,5 +33,10 @@ export const PostCreateShema = z.object({
   replies: z.array(z.lazy(() => PostSchema)).optional()
 });
 
+export const PostCreateShemaCaptcha = PostCreateShema.extend({
+  reCaptcha: string()
+});
+
 export interface IPostSchema extends TypeOf<typeof PostSchema> {}
 export interface IPostCreateSchema extends TypeOf<typeof PostCreateShema> {}
+export interface IPostCreateSchemaToken extends TypeOf<typeof PostCreateShemaCaptcha> {}

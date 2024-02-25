@@ -5,7 +5,7 @@ import { BrowserView } from 'react-device-detect';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
 
-import { PostTableHeader } from '../post-list-header';
+import { PostHeader } from '../post-list-header';
 import {
   StyledTitle,
   StyledPostTableContainer,
@@ -15,9 +15,9 @@ import { FormModal } from '../post-form/form-modal';
 import { QUERY_KEYS, ROUTER_KEYS } from '../../../consts/app-keys.const';
 import postService from '../post.service';
 import { selectUser } from '../../user/user.selector';
-import { IPost, PostFilters } from '../../../types/todo/post.types';
+import { IPost, PostFilters } from '../../../types/post/post.types';
 import { LoadMore } from '../load-more';
-import PostModel from '../../../types/todo/post.model';
+import PostModel from '../../../types/post/post.model';
 import { useFormattedPosts } from '../post.selectors';
 import { buildQueryString } from '../../../utils';
 import { PostList } from '../post-list';
@@ -135,7 +135,7 @@ export const PostContainer = () => {
 
       <BrowserView>
         <StyledPostTableContainer>
-          <PostTableHeader variant="enclosed" />
+          <PostHeader />
           <PostList modalOnOpen={modalOnOpen} posts={formatPosts} />
         </StyledPostTableContainer>
       </BrowserView>
