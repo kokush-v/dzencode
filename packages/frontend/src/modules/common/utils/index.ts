@@ -10,7 +10,7 @@ export const buildQueryString = (params: PostFilters) =>
 export const insertNestedPost = (posts: PostModel[], insertPost: IPost) => {
   return posts?.map((post) => {
     if (post.id === insertPost.parent) {
-      post?.replies?.push(new PostModel(insertPost));
+      post?.replies?.unshift(new PostModel(insertPost));
     } else {
       insertNestedPost(post.replies, insertPost);
     }

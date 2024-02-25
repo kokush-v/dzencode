@@ -4,6 +4,7 @@ import { IPostCreateSchema, IPostSchema, PostSchema } from '../schemas/post.sche
 import { queueService } from '../queue/bull';
 import QUEUES from '../queue/list';
 import { getNestedReplies } from '../utils';
+import { SortValues } from '../types/enums';
 
 export default class PostService {
   async create(post: IPostCreateSchema): Promise<IPostSchema> {
@@ -26,7 +27,9 @@ export default class PostService {
   }
 
   async findMany(
-    page: number
+    page: number,
+    sort: SortValues,
+    order: 'asc' | 'desc'
   ): Promise<{ data: IPostSchema[]; total: { value: number; relation: string } }> {
     try {
       const size = 25;
@@ -45,7 +48,8 @@ export default class PostService {
               }
             }
           }
-        }
+        },
+        sort: [{ [sort]: { order } }]
       });
 
       return {
@@ -81,7 +85,7 @@ export default class PostService {
       } = await db.search<IPostSchema>({
         index: INDEXES.POST,
         query: {
-          match_phrase_prefix: {
+          match: {
             parent: postId
           }
         }

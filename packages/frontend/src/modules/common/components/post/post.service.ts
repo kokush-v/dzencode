@@ -4,10 +4,10 @@ import { createPostModel } from '../../types/post/post.model';
 import { IPost, IPostForm, PostFilters } from '../../types/post/post.types';
 
 class PostService extends HttpService {
-  async getPosts(filter: Omit<PostFilters, 'maxPages'> | undefined, page: number) {
+  async getPosts(filter: Omit<PostFilters, 'maxPages'> | undefined) {
     const { data, pages = 1 } = await this.get<IPost[]>({
       url: BACKEND_KEYS.POSTS.ROOT,
-      params: { ...filter, page }
+      params: { ...filter }
     });
 
     return { data: data.map((todo) => createPostModel(todo)), pages };

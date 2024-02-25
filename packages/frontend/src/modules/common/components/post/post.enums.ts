@@ -1,6 +1,10 @@
 export enum PostFilterEnum {
-  ALL = 'All',
-  USER = 'User',
-  EMAIL = 'Email',
-  DATE = 'Date'
+  DATE = 'createdAt',
+  USER = 'userName',
+  EMAIL = 'userEmail'
+}
+
+export enum PostOrderEnum {
+  ASC = 'asc',
+  DESC = 'desc'
 }

@@ -16,6 +16,7 @@ import { fileUpload } from '../utils/file.upload';
 import { redisClient } from '../cache/redis';
 import { queueService } from '../queue/bull';
 import QUEUES from '../queue/list';
+import { OrderValues, SortValues } from '../types/enums';
 
 export class PostController {
   private postService: PostService;
@@ -44,10 +45,11 @@ export class PostController {
 
     const newPost = await this.postService.create(validPost);
 
-    const postJob = await queueService.addJob(QUEUES.POSTS, { page: 1 });
-    const postsWithTotal = await postJob.finished();
-
-    queueService.addJob(QUEUES.CACHE_DATA, { key: 'posts', data: postsWithTotal });
+    Object.values(SortValues).map((sort) => {
+      Object.values(OrderValues).map((order) => {
+        redisClient().del(`post:${sort}:${order}`);
+      });
+    });
 
     res.send({ data: newPost, message: MESSAGES.POST.CREATED });
   }
@@ -59,18 +61,21 @@ export class PostController {
   }
 
   async getMany(req: GetPostsRequestQuery, res: Response<GetPostsResponse>) {
-    const { page = 1 } = req.query;
+    const { page = 1, sort = SortValues.DATE, order = OrderValues.ASC } = req.query;
 
     let postsWithTotal: { data: IPostSchema[]; total: { value: number; relation: string } };
-    const cache = await redisClient().get('posts');
+    const cache = await redisClient().get(`post:${sort}:${order}`);
 
     if (cache) {
       postsWithTotal = JSON.parse(cache);
     } else {
-      const postJob = await queueService.addJob(QUEUES.POSTS, { page });
+      const postJob = await queueService.addJob(QUEUES.POSTS, { page, sort, order });
       postsWithTotal = await postJob.finished();
 
-      queueService.addJob(QUEUES.CACHE_DATA, { key: 'posts', data: postsWithTotal });
+      queueService.addJob(QUEUES.CACHE_DATA, {
+        key: `post:${sort}:${order}`,
+        data: postsWithTotal
+      });
     }
 
     res.send({
@@ -105,20 +110,13 @@ export class PostController {
 
     const newPost = await this.postService.create(validPost);
 
-    const postJob = await queueService.addJob(QUEUES.POSTS, { page: 1 });
-    const postsWithTotal = await postJob.finished();
-
-    queueService.addJob(QUEUES.CACHE_DATA, { key: 'posts', data: postsWithTotal });
+    Object.values(SortValues).map((sort) => {
+      Object.values(OrderValues).map((order) => {
+        redisClient().del(`post:${sort}:${order}`);
+      });
+    });
 
     res.send({ data: newPost, message: MESSAGES.POST.CREATED });
-  }
-
-  async getReply(req: GetPostRequest, res: Response<GetPostsResponse>) {
-    const { postId } = req.params;
-    const replies = await this.postService.findReplies(postId);
-    res.send({
-      data: replies
-    });
   }
 }
 

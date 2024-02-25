@@ -19,7 +19,7 @@ export default class UserService {
       hits: { hits }
     } = await db.search<IUserSchema>({
       query: {
-        match_phrase_prefix: {
+        match: {
           email: userEmail
         }
       }

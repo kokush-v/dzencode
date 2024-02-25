@@ -4,7 +4,8 @@ enum QUEUES {
   PASSWORD_HASH = 'passwordHash',
   POSTS = 'posts',
   CREATE = 'create',
-  CACHE_DATA = 'cacheData'
+  CACHE_DATA = 'cacheData',
+  CREATE_INDEX = 'createIndex'
 }
 
 export default QUEUES;

@@ -8,6 +8,7 @@ import db from '../config/database.config';
 import UserService from '../services/user.service';
 import { exTime, redisClient } from '../cache/redis';
 import PostService from '../services/post.service';
+import { OrderValues, SortValues } from '../types/enums';
 
 type InsertSchemas = IUserRegistrationSchema | IPostCreateSchema;
 type CacheSchemas = IUserSchema | IPostSchema | IPostSchema[];
@@ -73,17 +74,20 @@ export class QueueService {
         });
     });
 
-    this.defaultQueue.process(QUEUES.POSTS, async (job: Job<{ page: number }>, done) => {
-      const { page } = job.data;
-      new PostService()
-        .findMany(page)
-        .then((posts) => {
-          done(null, posts);
-        })
-        .catch((err) => {
-          done(err, null);
-        });
-    });
+    this.defaultQueue.process(
+      QUEUES.POSTS,
+      async (job: Job<{ page: number; sort: SortValues; order: OrderValues }>, done) => {
+        const { page, sort, order } = job.data;
+        new PostService()
+          .findMany(page, sort, order)
+          .then((posts) => {
+            done(null, posts);
+          })
+          .catch((err) => {
+            done(err, null);
+          });
+      }
+    );
 
     this.defaultQueue.process(
       QUEUES.COMPARE_PASSWORDS,
@@ -119,6 +123,31 @@ export class QueueService {
           console.error(err);
           if (err instanceof Error) done(err, null);
         }
+      }
+    );
+
+    this.defaultQueue.process(
+      QUEUES.CREATE_INDEX,
+      async (job: Job<{ indexName: string; mapping: any }>, done) => {
+        const { indexName, mapping } = job.data;
+
+        if (await db.indices.exists({ index: indexName })) {
+          done(null, indexName);
+        }
+
+        db.indices
+          .create({
+            index: indexName,
+            body: {
+              mappings: {
+                properties: mapping
+              }
+            }
+          })
+          .then(() => done(null, indexName))
+          .catch((err) => {
+            done(err, null);
+          });
       }
     );
   }

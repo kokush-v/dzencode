@@ -10,7 +10,7 @@ export const STORAGE_KEYS = {
 export const QUERY_KEYS = {
   POSTS: 'posts',
   USER: 'user',
-  FILTER: 'filter'
+  SORT: 'sort'
 };
 
 // Backend Routes
