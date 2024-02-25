@@ -19,8 +19,7 @@ export const BACKEND_KEYS = {
   POSTS: {
     ROOT: 'post',
     CREATE: 'post/create',
-    UPDATE: (postId?: number) => `post/update/${postId}`,
-    DELETE: (postId?: number) => `post/delete/${postId}`
+    REPLY: (postId?: string) => `post/reply/${postId}`
   },
   AUTH: {
     REG: 'user/register',

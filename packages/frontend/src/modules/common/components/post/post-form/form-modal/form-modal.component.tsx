@@ -11,17 +11,21 @@ import {
 } from '@chakra-ui/react';
 
 import { FormikForm } from '../formik';
+import { IPost } from '../../../../types/todo/post.types';
 
-interface FormModalProps extends Omit<ModalProps, 'children'> {}
+interface FormModalProps extends Omit<ModalProps, 'children'> {
+  initialData?: IPost;
+  formType: 'NEW' | 'REPLY';
+}
 
-export const FormModal = ({ isOpen, onClose }: FormModalProps) => (
+export const FormModal = ({ isOpen, onClose, initialData, formType }: FormModalProps) => (
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
     <ModalContent>
-      <ModalHeader>New Post</ModalHeader>
+      <ModalHeader>{initialData ? `Reply to ${initialData.userName}` : 'New POst'}</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-        <FormikForm />
+        <FormikForm initialData={initialData} formType={formType} />
       </ModalBody>
       <ModalFooter />
     </ModalContent>

@@ -1,7 +1,7 @@
 import { IPost } from './post.types';
 
 class PostModel implements IPost {
-  id: number;
+  id: string;
 
   userName: string;
 
@@ -13,17 +13,29 @@ class PostModel implements IPost {
 
   createdAt: Date;
 
-  constructor({ id, userName, userEmail, text, file, createdAt }: IPost) {
+  replies: IPost[];
+
+  constructor({ id, userName, userEmail, text, file: file, createdAt, replies }: IPost) {
+    console.log(text, replies);
+
     this.id = id;
     this.userName = userName;
     this.userEmail = userEmail;
     this.text = text;
     this.file = file;
     this.createdAt = createdAt;
+    this.replies = replies;
   }
 }
 
-const createPostModel = (postFromServer: IPost) => new PostModel(postFromServer);
+const createPostModel = (postFromServer: IPost) => {
+  const newPost = new PostModel(postFromServer);
+  newPost.replies.map((replies) => {
+    createPostModel(replies);
+  });
+
+  return newPost;
+};
 
 export { createPostModel };
 

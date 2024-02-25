@@ -1,13 +1,18 @@
 export interface IPost {
-  id: number;
+  id: string;
   userName: string;
   userEmail: string;
   text: string;
   file?: string;
   createdAt: Date;
+  replies: IPost[];
+  parent?: string;
 }
 
-export interface IPostForm extends Omit<IPost, 'id' | 'userName' | 'userEmail' | 'createdAt'> {}
+export interface IPostForm
+  extends Omit<IPost, 'id' | 'userName' | 'userEmail' | 'createdAt' | 'file' | 'replies'> {
+  file?: File;
+}
 
 export interface PostFilters {
   search: string;

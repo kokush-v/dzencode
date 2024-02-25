@@ -16,12 +16,13 @@ export interface LoginUserRequest extends Express.Request {
 export interface CreatePostRequest extends Express.Request {
   body: IPostCreateSchema;
 }
-
 export interface GetPostRequest extends Express.Request {
   params: {
     postId: string;
   };
 }
+
+export interface ReplyPostRequest extends CreatePostRequest, GetPostRequest {}
 
 export interface GetPostsRequestQuery extends Express.Request {
   query: {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, useDisclosure } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { BrowserView } from 'react-device-detect';
@@ -15,7 +15,7 @@ import { FormModal } from '../post-form/form-modal';
 import { QUERY_KEYS, ROUTER_KEYS } from '../../../consts/app-keys.const';
 import postService from '../post.service';
 import { selectUser } from '../../user/user.selector';
-import { PostFilters } from '../../../types/todo/post.types';
+import { IPost, PostFilters } from '../../../types/todo/post.types';
 import { LoadMore } from '../load-more';
 import PostModel from '../../../types/todo/post.model';
 import { useFormattedPosts } from '../post.selectors';
@@ -29,6 +29,8 @@ export const PostContainer = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = selectUser();
+  const [replyParent, setReplyParent] = useState<IPost>();
+  const [formType, setFormType] = useState<'NEW' | 'REPLY'>('NEW');
 
   const searchParams = new URLSearchParams(window.location.search);
 
@@ -102,12 +104,19 @@ export const PostContainer = () => {
     refetch();
   }, [params]);
 
+  const modalOnOpen = (postParent: IPost) => {
+    setReplyParent(postParent);
+    setFormType('REPLY');
+    onOpen();
+  };
+
   return (
     <PostContainerStyled>
       <StyledTitle>
         <h1>POSTS List</h1>
         <Button
           onClick={() => {
+            setFormType('NEW');
             user ? onOpen() : navigate(ROUTER_KEYS.AUTH.LOGIN);
           }}
           colorScheme="purple"
@@ -116,13 +125,18 @@ export const PostContainer = () => {
         >
           NEW POST
         </Button>
-        <FormModal isOpen={isOpen} onClose={onClose} />
+        <FormModal
+          formType={formType}
+          isOpen={isOpen}
+          onClose={onClose}
+          initialData={replyParent}
+        />
       </StyledTitle>
 
       <BrowserView>
         <StyledPostTableContainer>
           <PostTableHeader variant="enclosed" />
-          <PostList posts={formatPosts} />
+          <PostList modalOnOpen={modalOnOpen} posts={formatPosts} />
         </StyledPostTableContainer>
       </BrowserView>
 

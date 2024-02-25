@@ -1,6 +1,11 @@
 import { Response } from 'express';
 
-import { CreatePostRequest, GetPostRequest, GetPostsRequestQuery } from '../types/requests.types';
+import {
+  CreatePostRequest,
+  GetPostRequest,
+  GetPostsRequestQuery,
+  ReplyPostRequest
+} from '../types/requests.types';
 import PostService from '../services/post.service';
 import { CreatePostResponse, GetPostResponse, GetPostsResponse } from '../types/responses.types';
 import { MESSAGES } from '../constants';
@@ -39,6 +44,11 @@ export class PostController {
 
     const newPost = await this.postService.create(validPost);
 
+    const postJob = await queueService.addJob(QUEUES.POSTS, { page: 1 });
+    const postsWithTotal = await postJob.finished();
+
+    queueService.addJob(QUEUES.CACHE_DATA, { key: 'posts', data: postsWithTotal });
+
     res.send({ data: newPost, message: MESSAGES.POST.CREATED });
   }
 
@@ -70,6 +80,44 @@ export class PostController {
         Math.ceil(postsWithTotal.total.value / 10) === 0
           ? 1
           : Math.ceil(postsWithTotal.total.value / 10)
+    });
+  }
+  async reply(req: ReplyPostRequest, res: Response<CreatePostResponse>) {
+    const { text } = req.body;
+    const { postId } = req.params;
+    const { email, name } = req.user as IUserSessionSchema;
+    const file = req.file;
+
+    let fileUrl;
+
+    if (file) {
+      fileUrl =
+        file?.mimetype.split('/')[0] === 'image' ? await photoUpload(file) : await fileUpload(file);
+    }
+
+    const validPost = PostCreateShema.parse({
+      userName: name,
+      userEmail: email,
+      text,
+      file: fileUrl,
+      parent: postId
+    });
+
+    const newPost = await this.postService.create(validPost);
+
+    const postJob = await queueService.addJob(QUEUES.POSTS, { page: 1 });
+    const postsWithTotal = await postJob.finished();
+
+    queueService.addJob(QUEUES.CACHE_DATA, { key: 'posts', data: postsWithTotal });
+
+    res.send({ data: newPost, message: MESSAGES.POST.CREATED });
+  }
+
+  async getReply(req: GetPostRequest, res: Response<GetPostsResponse>) {
+    const { postId } = req.params;
+    const replies = await this.postService.findReplies(postId);
+    res.send({
+      data: replies
     });
   }
 }
