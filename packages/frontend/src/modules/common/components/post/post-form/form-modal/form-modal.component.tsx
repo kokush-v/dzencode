@@ -22,7 +22,7 @@ export const FormModal = ({ isOpen, onClose, initialData, formType }: FormModalP
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
     <ModalContent>
-      <ModalHeader>{initialData ? `Reply to ${initialData.userName}` : 'New POst'}</ModalHeader>
+      <ModalHeader>{initialData ? `Reply to ${initialData.userName}` : 'New POST'}</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
         <FormikForm initialData={initialData} formType={formType} />
