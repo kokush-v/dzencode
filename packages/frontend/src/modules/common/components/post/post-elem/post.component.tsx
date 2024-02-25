@@ -19,7 +19,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 
-import { IPost } from '../../../types/todo/post.types';
+import { IPost } from '../../../types/post/post.types';
 import { PostTextStyled } from './post.styled';
 import LightBoxImage from '../../ui/lightbox';
 import { GoFile, GoReply } from 'react-icons/go';

@@ -12,5 +12,6 @@ export const loginValidationBodySchema = Joi.object({
 });
 
 export const postCreateValidationSchema = Joi.object({
-  text: Joi.string().required()
+  text: Joi.string().required(),
+  reCaptcha: Joi.string().required()
 });
