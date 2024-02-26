@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This project is a test project for dZENcode. It includes a backend application that utilizes Redis for caching and queues.
+This project is a test project for dZENcode. It includes an application for posting comments. It uses Redis for caching and queues, and Elasticsearch as a database. The frontend is built with React, and the backend uses Express.js.
 
 ## Setup
 
@@ -34,7 +34,14 @@ To start the project, use the following command:
 yarn start
 ```
 
-This will launch your project and you can access it at `http://localhost:PORT` in your browser.
+This will launch your project, and you can access it at `http://localhost:PORT` in your browser.
+
+## Technologies Stack
+
+- Frontend: React
+- Backend: Express.js
+- Caching: Redis
+- Database: Elasticsearch
 
 ## License
 
