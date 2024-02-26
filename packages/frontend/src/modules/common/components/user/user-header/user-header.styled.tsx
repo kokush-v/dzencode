@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
-import { isMobile } from 'react-device-detect';
 
 import { IUser } from '../../../types/user/user.types';
-import { COLORS } from '../../../../theme';
 
 interface UserHeaderStyledProps {
   user: IUser | undefined;
@@ -18,5 +16,4 @@ export const UserHeaderStyled = styled('div')<UserHeaderStyledProps>`
   align-items: center;
   justify-content: ${({ user }) => (user ? 'space-around' : 'end')};
   margin-bottom: 0.5em;
-  ${!isMobile && `border-bottom: 1px solid ${COLORS.gray};`};
 `;

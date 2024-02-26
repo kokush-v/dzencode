@@ -24,7 +24,7 @@ export class QueueService {
       removeOnFail: true // this indicates if the job should be removed from the queue if it fails
     },
     connection: {
-      host: '127.0.0.1',
+      host: process.env.REDIS_HOST || '127.0.0.1',
       port: process.env.BULL_PORT
     }
   };
