@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Spinner, Text, useDisclosure } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
-import { BrowserView } from 'react-device-detect';
 import { useInfiniteQuery, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
 
@@ -134,32 +133,29 @@ export const PostContainer = () => {
           initialData={replyParent}
         />
       </StyledTitle>
-      {isLoading ||
-        (isFetching && (
-          <div
-            style={{
-              position: 'absolute',
-              width: '100vw',
-              height: '100vh',
-              backgroundColor: 'rgba(255, 255, 255, 0.54)',
-              zIndex: '100',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <Spinner size={'xl'} />
-          </div>
-        ))}
+      {(isLoading || isFetching) && (
+        <div
+          style={{
+            position: 'absolute',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(255, 255, 255, 0.54)',
+            zIndex: '100',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <Spinner size={'xl'} />
+        </div>
+      )}
 
       {isError && <Text>Server error</Text>}
       {posts && (
-        <BrowserView>
-          <StyledPostTableContainer>
-            <PostHeader />
-            <PostList modalOnOpen={modalOnOpen} posts={formatPosts} />
-          </StyledPostTableContainer>
-        </BrowserView>
+        <StyledPostTableContainer>
+          <PostHeader />
+          <PostList modalOnOpen={modalOnOpen} posts={formatPosts} />
+        </StyledPostTableContainer>
       )}
 
       <LoadMore

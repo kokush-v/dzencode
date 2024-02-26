@@ -18,17 +18,6 @@ export class QueueService {
 
   private static instance: QueueService;
 
-  private static QUEUE_OPTIONS = {
-    defaultJobOptions: {
-      removeOnComplete: true, // this indicates if the job should be removed from the queue once it's complete
-      removeOnFail: true // this indicates if the job should be removed from the queue if it fails
-    },
-    connection: {
-      host: '127.0.0.1',
-      port: process.env.BULL_PORT
-    }
-  };
-
   constructor() {
     if (QueueService.instance instanceof QueueService) {
       return QueueService.instance;
@@ -38,13 +27,20 @@ export class QueueService {
   }
 
   async initService() {
-    this.defaultQueue = await new Bull('bull-queue', QueueService.QUEUE_OPTIONS).isReady();
+    await new Bull('bull-queue', {
+      redis: { host: process.env.REDIS_HOST, port: process.env.REDIS_PORT }
+    })
+      .isReady()
+      .then((queue) => {
+        this.defaultQueue = queue;
+        console.log(`Bull connect status: ${this.defaultQueue.client.status}`);
+      })
+      .catch((err) => console.log('BULL_ERROR==============================', err));
 
     queueService.getQueue().on('failed', (job, err) => {
       throw new Error(`Job ${job.id} failed with error ${err.message}`);
     });
 
-    console.log(`Bull connect status: ${this.defaultQueue.client.status}`);
     await this.initProcceses();
   }
 

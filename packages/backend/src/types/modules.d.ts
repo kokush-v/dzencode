@@ -8,7 +8,8 @@ declare global {
       ELASTIC_API_KEY_ID: string;
       ELASTIC_API_KEY: string;
       ELASTIC_CLOUD_ID: string;
-      BULL_PORT: number;
+      REDIS_PORT: number;
+      REDIS_HOST: string;
       FIREBASE_API_KEY: string;
       FIREBASE_AUTH_DOMAIN: string;
       FIREBASE_PROJECT_ID: string;

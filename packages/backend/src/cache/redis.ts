@@ -5,9 +5,11 @@ export class RedisService {
   dataExTime = 60;
 
   async initRedis() {
-    this.redisClient = (await createClient().connect()) as RedisClientType;
+    this.redisClient = (await createClient({
+      url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+    }).connect()) as RedisClientType;
 
-    this.redisClient.on('error', (error) => console.error(error));
+    this.redisClient.on('REDIS_SERVICE=======================', (error) => console.error(error));
 
     console.log('Redis connected');
   }

@@ -16,7 +16,6 @@ import {
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
-import { isMobile, isMobileOnly } from 'react-device-detect';
 
 import { AuthData } from '../../../types/auth/auth.types';
 import { authSchema } from './validation.schema';
@@ -97,7 +96,7 @@ export const FormikAuthForm = ({ type }: FormikAuthFormProps) => {
 
   return (
     <Flex bg="gray.100" align="center" justify="center" h="100vh">
-      <Box bg="white" p={6} rounded="md" w={isMobileOnly ? '100%' : isMobile ? '75%' : '25%'}>
+      <Box bg="white" p={6} rounded="md" w={'25%'}>
         <form onSubmit={formik.handleSubmit}>
           <VStack spacing={4} align="flex-start">
             <Heading size={'md'} color="purple" textTransform={'uppercase'}>

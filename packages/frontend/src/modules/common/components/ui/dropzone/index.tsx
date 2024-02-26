@@ -1,4 +1,4 @@
-import React, { ChangeEventHandler, useState } from 'react';
+import React, { useState } from 'react';
 import { HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { useDropzone } from 'react-dropzone';
 import { BsFileEarmarkArrowUp } from 'react-icons/bs';
